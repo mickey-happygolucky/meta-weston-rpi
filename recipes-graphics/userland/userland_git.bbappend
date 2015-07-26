@@ -8,6 +8,7 @@ SRC_URI += "file://egl.pc \
 	    file://glesv2.pc \
  	    file://bcm_host.pc \
 	    file://0001-wayland-support.patch \
+            file://buildme.patch \
 "
 
 EXTRA_OECMAKE += "-DBUILD_WAYLAND=1"

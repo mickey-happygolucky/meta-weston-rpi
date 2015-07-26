@@ -30,42 +30,6 @@ diff -Narubp a/README.md b/README.md
 +To build support for the Wayland winsys in EGL, execute the buildme script like this:
 +
 +$ BUILD_WAYLAND=1 ./buildme.
-diff -Narubp a/buildme b/buildme
---- a/buildme	2015-02-28 08:44:03.144718163 +0900
-+++ b/buildme	2015-02-28 10:38:02.852914891 +0900
-@@ -1,10 +1,14 @@
- #/bin/bash
- 
-+if [ -n "$BUILD_WAYLAND" ]; then
-+	WAYLAND_VARS="-DBUILD_WAYLAND=TRUE"
-+fi
-+
- if [ "armv6l" = `arch` ]; then
- 	# Native compile on the Raspberry Pi
- 	mkdir -p build/raspberry/release
- 	pushd build/raspberry/release
--	cmake -DCMAKE_BUILD_TYPE=Release ../../..
-+	cmake -DCMAKE_BUILD_TYPE=Release $WAYLAND_VARS ../../..
- 	make
- 	if [ "$1" != "" ]; then
- 	 sudo make install DESTDIR=$1
-@@ -13,9 +17,15 @@ if [ "armv6l" = `arch` ]; then
- 	fi
- else
- 	# Cross compile on a more capable machine
-+
-+	if [ -n "$BUILD_WAYLAND" ]; then
-+		# Use wayland-scanner from the build platform
-+		WAYLAND_VARS+=" -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=/usr/bin/wayland-scanner"
-+	fi
-+
- 	mkdir -p build/arm-linux/release/
- 	pushd build/arm-linux/release/
--	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=Release ../../..
-+	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=Release $WAYLAND_VARS ../../..
- 	make -j 6
- 
- 	if [ "$1" != "" ]; then
 diff -Narubp a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
 --- a/interface/khronos/CMakeLists.txt	2015-02-28 08:44:03.332718168 +0900
 +++ b/interface/khronos/CMakeLists.txt	2015-02-28 10:38:02.820914890 +0900
